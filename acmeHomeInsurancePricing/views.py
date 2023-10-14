@@ -60,6 +60,7 @@ def post_quote(request: HttpRequest):
     quote_subtotal = 0
     multiplier = 1
 
+    rules_applied = {}
     for rule in rules:
         if rule.rule_name not in json_req:
             continue
@@ -72,17 +73,20 @@ def post_quote(request: HttpRequest):
             multiplier *= 1 + rule.value
         else:
             quote_subtotal += rule.value
+        rules_applied[rule.rule_name] = req_value
 
     quote_subtotal *= multiplier
     taxes = quote_subtotal * state.monthly_tax
+    rules_applied["monthly_tax"] = state.monthly_tax
 
     try:
+        json_str = json.dumps(rules_applied)
         quote = Quote.objects.create(
-            monthly_subtotal=quote_subtotal, monthly_taxes=taxes
+            monthly_subtotal=quote_subtotal, monthly_taxes=taxes, rules=json_str
         )
     except Exception as e:
         return JsonResponse(
-            {"message": "An error arrised while creating quote id."}, 500
+            {"message": "An error arrised while creating quote id."}, status=500
         )
 
     result = {

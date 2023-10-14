@@ -38,8 +38,16 @@ class QuoteRule(models.Model):
 
 
 class Quote(models.Model):
+    """
+    Outcome after quote calculation.
+    :param monthly_subtotal: The product/sum after all quote rules have been applied.
+    :param monthly_taxes: The monthly tax differed by state.
+    :param factors: String Json representation of all rules applied to the quote.
+    """
+
     monthly_subtotal = models.FloatField()
     monthly_taxes = models.FloatField()
+    rules = models.CharField(max_length=200)
 
     def __str__(self) -> str:
         return f"Quote<{self.pk}>(subtotal: {self.monthly_subtotal}, taxes: {self.monthly_taxes})"
