@@ -32,7 +32,7 @@ def get_quote(request: HttpRequest, quote_id):
 
 
 @api_view(("POST",))
-def post_quote(request: HttpRequest):
+def submit_quote(request: HttpRequest):
     """
     Using the information provided, create a quote, store it in the DB, and return to user.
     :param request: HttpRequest
