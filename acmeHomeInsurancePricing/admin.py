@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import StateMultipliers, Quotes
+from .models import Quote, QuoteRule, State
 
-admin.site.register(StateMultipliers)
-admin.site.register(Quotes)
+admin.site.register(QuoteRule)
+admin.site.register(Quote)
+admin.site.register(State)

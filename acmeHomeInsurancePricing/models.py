@@ -1,17 +1,45 @@
 from django.db import models
 
 
-class StateMultipliers(models.Model):
+class State(models.Model):
+    """
+    State model.
+    :param name: 20-character max length of state/territory.
+    :param monthly_tax: Monthly rate calculated after rule calculations.
+    """
+
     name = models.CharField(max_length=20)
     monthly_tax = models.FloatField()
-    flood_coverage = models.FloatField()
+
+    def __str__(self) -> str:
+        return self.name
 
 
-class StateAdditions(models.Model):
-    name = models.CharField(max_length=20)
-    coverage = models.BooleanField()
+class QuoteRule(models.Model):
+    """
+    Quote rules to add or multiply to the quote's running monthly subtotal on calculation.
+    :param rule: The rule's name. Matches API request.
+    :param value: Amount added/multiplied to the running monthly subtotal.
+    :param on_value: Value is applied to monthly subtotal when on_value matches API request.
+    :param is_multiplier: If true, value is multiplied to the subtotal at the end of calculation.
+    :param state: State model.
+    """
+
+    rule_name = models.CharField(max_length=40)
+    value = models.FloatField()
+    on_value = models.CharField(max_length=40)
+    is_multiplier = models.BooleanField()
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        operator = "multiplies" if self.is_multiplier else "adds"
+        value = 1 + self.value if self.is_multiplier else self.value
+        return f"Rule<{self.state.name},{self.rule_name}> {operator} {value} when {self.on_value}"
 
 
-class Quotes(models.Model):
+class Quote(models.Model):
     monthly_subtotal = models.FloatField()
     monthly_taxes = models.FloatField()
+
+    def __str__(self) -> str:
+        return f"Quote<{self.pk}>(subtotal: {self.monthly_subtotal}, taxes: {self.monthly_taxes})"
