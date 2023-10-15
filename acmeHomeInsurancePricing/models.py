@@ -1,3 +1,6 @@
+import json
+from typing import Optional
+
 from django.db import models
 
 
@@ -46,9 +49,21 @@ class Quote(models.Model):
     :param rules: String Json representation of all rules applied to the quote.
     """
 
+    owner_name = models.CharField(max_length=40)
     monthly_subtotal = models.FloatField()
     monthly_taxes = models.FloatField()
-    rules = models.CharField(max_length=200)
+    rules = models.CharField(max_length=400)
 
     def __str__(self) -> str:
         return f"Quote<{self.pk}>(subtotal: {self.monthly_subtotal}, taxes: {self.monthly_taxes})"
+
+    @property
+    def monthly_total(self):
+        return self.monthly_subtotal + self.monthly_taxes
+
+    @property
+    def rules_to_json_dict(self) -> Optional[dict]:
+        try:
+            return json.loads(self.rules)
+        except Exception as _:
+            return None
