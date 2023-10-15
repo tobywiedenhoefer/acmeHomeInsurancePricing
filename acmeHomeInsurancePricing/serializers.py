@@ -5,4 +5,4 @@ from .models import Quote
 class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
-        fields = ["id", "monthly_subtotal", "monthly_taxes"]
+        fields = ["id", "monthly_subtotal", "monthly_taxes", "rules", "owner_name"]

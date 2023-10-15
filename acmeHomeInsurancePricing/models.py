@@ -18,7 +18,7 @@ class State(models.Model):
 class QuoteRule(models.Model):
     """
     Quote rules to add or multiply to the quote's running monthly subtotal on calculation.
-    :param rule: The rule's name. Matches API request.
+    :param rule_name: The rule's name. Matches API request.
     :param value: Amount added/multiplied to the running monthly subtotal.
     :param on_value: Value is applied to monthly subtotal when on_value matches API request.
     :param is_multiplier: If true, value is multiplied to the subtotal at the end of calculation.
@@ -40,9 +40,10 @@ class QuoteRule(models.Model):
 class Quote(models.Model):
     """
     Outcome after quote calculation.
+    :param owner_name: Name of person who owns/requested the quote for creation.
     :param monthly_subtotal: The product/sum after all quote rules have been applied.
     :param monthly_taxes: The monthly tax differed by state.
-    :param factors: String Json representation of all rules applied to the quote.
+    :param rules: String Json representation of all rules applied to the quote.
     """
 
     monthly_subtotal = models.FloatField()
