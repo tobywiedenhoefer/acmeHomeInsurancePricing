@@ -27,7 +27,10 @@ def get_quote(request: HttpRequest, quote_id):
     try:
         quote = Quote.objects.get(pk=quote_id)
         serialized = QuoteSerializer(quote)
-        return JsonResponse(serialized.data, safe=False)
+        data = serialized.data
+        data["rules"] = json.loads(data["rules"])
+        data["monthly_total"] = quote.monthly_total
+        return JsonResponse(data)
     except Quote.DoesNotExist:
         return JsonResponse({}, status=404)
 
@@ -44,13 +47,19 @@ def submit_quote(request: HttpRequest):
         json_req = json.loads(body)
     except json.decoder.JSONDecodeError:
         return JsonResponse({"message": "Request body must be JSON."}, status=400)
-    except Exception as e:
-        print("Unknown error:", e)
+    except Exception as _:
         return JsonResponse({"message": "An unknown error has occurred."}, status=500)
 
     state_name = json_req.get("state", None)
+    owner_name = json_req.get("owner_name", None)
     if not state_name:
-        return JsonResponse({"message": "Request must include state."}, status=422)
+        return JsonResponse(
+            {"message": "Request must include a state name."}, status=422
+        )
+    elif not owner_name:
+        return JsonResponse(
+            {"message": "Request must include an owner/buyer name."}, status=422
+        )
 
     try:
         state: State = State.objects.filter(name=state_name).first()
@@ -62,20 +71,19 @@ def submit_quote(request: HttpRequest):
     quote_dict = calculate_quote(json_req=json_req, state=state)
 
     try:
-        json_str = json.dumps(rules_applied)
         quote = Quote.objects.create(
-            monthly_subtotal=quote_subtotal, monthly_taxes=taxes, rules=json_str
+            owner_name=owner_name,
+            monthly_subtotal=quote_dict["monthly_subtotal"],
+            monthly_taxes=quote_dict["monthly_taxes"],
+            rules=quote_dict["rules"],
         )
     except Exception as e:
         return JsonResponse(
             {"message": "An error arrised while creating quote id."}, status=500
         )
 
-    result = {
-        "quote_id": quote.pk,
-        "monthly_subtotal": quote_subtotal,
-        "monthly_tax": taxes,
-        "monthly_total": quote_subtotal + taxes,
-    }
+    quote_dict["owner_name"] = owner_name
+    quote_dict["quote_id"] = quote.pk
+    quote_dict["rules"] = json.loads(quote_dict["rules"])
 
-    return JsonResponse(result)
+    return JsonResponse(quote_dict, status=201)
