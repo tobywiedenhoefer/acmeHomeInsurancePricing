@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 
 from .models import Quote, State, QuoteRule
 from .serializers import QuoteSerializer
+from .shared.quote_algorithm import calculate_quote
 
 
 INVALID_METHOD = JsonResponse({"message": "Invalid Method"}, status=405)
@@ -53,31 +54,12 @@ def submit_quote(request: HttpRequest):
 
     try:
         state: State = State.objects.filter(name=state_name).first()
-        rules: List[QuoteRule] = QuoteRule.objects.filter(state=state)
+        if not state:
+            raise State.DoesNotExist
     except State.DoesNotExist:
         return JsonResponse({"message": "Requested is not supported."}, status=404)
 
-    quote_subtotal = 0
-    multiplier = 1
-
-    rules_applied = {}
-    for rule in rules:
-        if rule.rule_name not in json_req:
-            continue
-
-        req_value = json_req[rule.rule_name]
-        if str(req_value) != rule.on_value:
-            continue
-
-        if rule.is_multiplier:
-            multiplier *= 1 + rule.value
-        else:
-            quote_subtotal += rule.value
-        rules_applied[rule.rule_name] = req_value
-
-    quote_subtotal *= multiplier
-    taxes = quote_subtotal * state.monthly_tax
-    rules_applied["monthly_tax"] = state.monthly_tax
+    quote_dict = calculate_quote(json_req=json_req, state=state)
 
     try:
         json_str = json.dumps(rules_applied)
