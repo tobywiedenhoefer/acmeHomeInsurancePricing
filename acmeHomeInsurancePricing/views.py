@@ -30,6 +30,8 @@ def get_quote(request: HttpRequest, quote_id):
         data = serialized.data
         data["rules"] = json.loads(data["rules"])
         data["monthly_total"] = quote.monthly_total
+        data["quote_id"] = data["id"]
+        del data["id"]
         return JsonResponse(data)
     except Quote.DoesNotExist:
         return JsonResponse({}, status=404)

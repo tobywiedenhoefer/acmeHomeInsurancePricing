@@ -54,7 +54,7 @@ class TestViews(TestCase):
         content = json.loads(response.content)
 
         self.assertEquals(response.status_code, 200)
-        self.assertEquals(self.valid_quote.pk, content.get("id"))
+        self.assertEquals(self.valid_quote.pk, content.get("quote_id"))
         self.assertEquals(2.22, content.get("monthly_subtotal"))
         self.assertEquals(1.11, content.get("monthly_taxes"))
         self.assertEquals(3.33, content.get("monthly_total"))
