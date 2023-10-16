@@ -39,6 +39,6 @@ def calculate_quote(json_req: dict, state: State) -> dict:
     return {
         "monthly_subtotal": quote_subtotal,
         "monthly_taxes": monthly_taxes,
-        "monthly_total": quote_subtotal + monthly_taxes,
+        "monthly_total": round(quote_subtotal + monthly_taxes, 3),
         "rules": rules_applied_str,
     }

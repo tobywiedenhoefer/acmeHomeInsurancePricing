@@ -59,7 +59,7 @@ class Quote(models.Model):
 
     @property
     def monthly_total(self):
-        return self.monthly_subtotal + self.monthly_taxes
+        return round(self.monthly_subtotal + self.monthly_taxes, 3)
 
     @property
     def rules_to_json_dict(self) -> Optional[dict]:
