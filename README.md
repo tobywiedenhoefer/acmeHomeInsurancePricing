@@ -166,17 +166,17 @@ This returns a 200 response with the following body:
     "monthly_taxes": 0.01
   },
   "owner_name": "John Smith",
-  "quote_id": 3
+  "id": 3
 }
 ```
 
-The returned <b>quote_id</b> can be used to retreive the submitted quote at a later time.
+The returned <b>id</b> can be used to retreive the submitted quote at a later time.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Get a Quote
 
-To get a previously submitted quote, such as in the above example, a request can be sent to the `quotes/<quote_id>` route, where <b>quote_id</b> is the returned <b>quote_id</b> above:
+To get a previously submitted quote, such as in the above example, a request can be sent to the `quotes/<id>` route, where <b>id</b> is the returned <b>id</b> above:
 
 ```cURL
 curl --location 'http://localhost:8000/quotes/3'
@@ -197,7 +197,7 @@ The request will give us a response with all the rules requested at the time of 
   },
   "owner_name": "John Smith",
   "monthly_total": 61.812,
-  "quote_id": 3
+  "id": 3
 }
 ```
 
