@@ -50,7 +50,6 @@ class TestModels(TestCase):
         self.assertEquals(self.quote.monthly_taxes, quote.monthly_taxes)
         self.assertEquals(self.quote.rules, quote.rules)
         self.assertEquals(self.quote.monthly_total, quote.monthly_total)
-        self.assertEquals(self.quote.rules_to_json_dict, quote.rules_to_json_dict)
 
     def test_get_coverage_type_rule_by_state(self):
         """
